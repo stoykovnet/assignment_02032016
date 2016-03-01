@@ -1,5 +1,4 @@
 // Test imports.
-var utils = require('../utils');
 var expect = require('chai').expect;
 
 // Database imports.
@@ -15,7 +14,7 @@ describe('UserModel', function () {
         firstName: 'Test',
         lastName: 'Testen',
         honorific: 'Dr.',
-        sex: '',
+        sex: 'Female',
         address: 'Testengade 1',
         city: 'Aalborg',
         zipCode: '9000'
@@ -47,10 +46,11 @@ describe('UserModel', function () {
 
         it('should not allow two users to have the same email address',
             function (done) {
-                var user = new User(testData);
+                var userA = new User(testData);
+                var userB = new User(testData);
 
-                user.save(function (err) {
-                    user.save(function (err) {
+                userA.save(function (err) {
+                    userB.save(function (err) {
                         //There should be an error!
                         expect(err).to.not.equal(null);
 
@@ -61,7 +61,7 @@ describe('UserModel', function () {
         );
     });
 
-    describe('Authentication', function () {
+    describe('Password Security', function () {
         it('should salt and hash user passwords',
             function (done) {
                 var user = new User(testData);
