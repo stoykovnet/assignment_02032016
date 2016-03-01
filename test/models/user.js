@@ -1,5 +1,7 @@
 // Test imports.
+require('../utils');
 var expect = require('chai').expect;
+var testData = require('../userTestData');
 
 // Database imports.
 var mongoose = require('mongoose');
@@ -7,19 +9,6 @@ require('../../models/Users');
 var User = mongoose.model('User');
 
 describe('UserModel', function () {
-    var testData = {
-        email: 'test@test.com',
-        hash: 'hash-test',
-        salt: 'salt-test',
-        firstName: 'Test',
-        lastName: 'Testen',
-        honorific: 'Dr.',
-        sex: 'Female',
-        address: 'Testengade 1',
-        city: 'Aalborg',
-        zipCode: '9000'
-    };
-
     describe('Insert', function () {
         it('should save data for the fields below',
             function (done) {
@@ -99,10 +88,10 @@ describe('UserModel', function () {
         it('should NOT accept invalid passwords',
             function (done) {
                 var user = new User(testData);
-                var validPassword = 'password';
+                var testPassword = 'password';
                 var invalidPassword = 'invalid';
 
-                user.setPassword(validPassword);
+                user.setPassword(testPassword);
 
                 user.save(function (err, saved) {
                     var isValid = saved.validatePassword(invalidPassword);
