@@ -1,5 +1,6 @@
 var mongoose = require('mongoose');
 var crypto = require('crypto');
+var jwt = require('jsonwebtoken');
 
 var UserSchema = new mongoose.Schema({
     email: {type: String, unique: true},
@@ -11,7 +12,8 @@ var UserSchema = new mongoose.Schema({
     sex: String,
     address: String,
     city: String,
-    zipCode: String
+    zipCode: String,
+    role: {type: String, default: 'user'}
 });
 
 /*
@@ -30,6 +32,24 @@ UserSchema.methods.validatePassword = function (password) {
     var hash = crypto.pbkdf2Sync(password, this.salt, 1000, 64).toString('hex');
 
     return this.hash === hash;
+};
+
+/*
+ * Generate json web token which will be valid for 30 days.
+ */
+UserSchema.methods.generateToken = function () {
+
+    var today = new Date();
+    var expire = new Date();
+    expire.setDate(today.getDate() + 30);
+
+    return jwt.sign({
+            _id: this._id,
+            email: this.email,
+            expire: parseInt(expire.getTime() / 1000)
+        },
+        'SOME_SECRET' // Secret key to sign tokens.
+    );
 };
 
 mongoose.model('User', UserSchema);

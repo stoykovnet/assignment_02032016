@@ -8,7 +8,8 @@ var userTestData = {
     sex: 'Female',
     address: 'Testengade 1',
     city: 'Aalborg',
-    zipCode: '9000'
+    zipCode: '9000',
+    role: 'user'
 };
 
 module.exports = userTestData;

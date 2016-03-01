@@ -27,13 +27,13 @@ describe('UserModel', function () {
                     expect(saved.address).to.equal(testData.address);
                     expect(saved.city).to.equal(testData.city);
                     expect(saved.zipCode).to.equal(testData.zipCode);
-
+                    expect(saved.role).to.equal(testData.role);
                     done();
                 });
             }
         );
 
-        it('should not allow two users to have the same email address',
+        it('should not allow two authentication to have the same email address',
             function (done) {
                 var userA = new User(testData);
                 var userB = new User(testData);
