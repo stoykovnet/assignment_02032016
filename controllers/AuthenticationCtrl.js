@@ -11,7 +11,7 @@ var AuthenticationCtrl = new function () {
      * @param req
      * @param callback
      */
-    this.validateRegisterInput = function(req, callback) {
+    this.validateRegisterInput = function (req, callback) {
         var errors = [];
 
         _validateEmail(req.body.email, function (email_err) {
@@ -45,7 +45,7 @@ var AuthenticationCtrl = new function () {
      * @param req
      * @param callback
      */
-    this.registerUser = function(req, callback) {
+    this.registerUser = function (req, callback) {
         _populateUser(req, function (user) {
 
             user.save(function (err, saved) {

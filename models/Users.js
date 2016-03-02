@@ -3,11 +3,12 @@ var crypto = require('crypto');
 var jwt = require('jsonwebtoken');
 
 var UserSchema = new mongoose.Schema({
-    email: {type: String, unique: true},
-    hash: String,
-    salt: String,
-    firstName: String,
-    lastName: String,
+    // Why unique doesn't work?
+    email: {type: String, index: true, unique: true , required: true},
+    hash: {type: String, required: true},
+    salt: {type: String, required: true},
+    firstName: {type: String, required: true},
+    lastName: {type: String, required: true},
     honorific: String,
     sex: String,
     address: String,

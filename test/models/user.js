@@ -17,34 +17,14 @@ describe('UserModel', function () {
                     // There should be no errors!
                     expect(err).to.equal(null);
 
-                    expect(saved.email).to.equal(testData.email);
-                    expect(saved.hash).to.equal(testData.hash);
-                    expect(saved.salt).to.equal(testData.salt);
-                    expect(saved.firstName).to.equal(testData.firstName);
-                    expect(saved.lastName).to.equal(testData.lastName);
-                    expect(saved.honorific).to.equal(testData.honorific);
-                    expect(saved.sex).to.equal(testData.sex);
-                    expect(saved.address).to.equal(testData.address);
-                    expect(saved.city).to.equal(testData.city);
-                    expect(saved.zipCode).to.equal(testData.zipCode);
-                    expect(saved.role).to.equal(testData.role);
-                    done();
+                    assertUserData(saved, done);
                 });
             }
         );
 
         it('should not allow two users to have the same email address',
             function (done) {
-                var userA = new User(testData);
-                var userB = new User(testData);
-
-                userA.save(function (err, savedA) {
-                    userB.save(function (err, savedB) {
-                        expect(savedA).to.not.equal(savedB);
-
-                        done();
-                    });
-                });
+                assertEmailDuplication(done);
             }
         );
     });
@@ -57,13 +37,7 @@ describe('UserModel', function () {
 
                 user.setPassword(testPassword);
                 user.save(function (err, saved) {
-                    expect(saved.hash).to.not.equal(testPassword);
-                    expect(saved.salt).to.not.equal(testPassword);
-
-                    expect(saved.hash).to.not.equal(testData.hash);
-                    expect(saved.salt).to.not.equal(testData.salt);
-
-                    done();
+                    assertUserPassword(saved, testPassword, done);
                 });
             }
         );
@@ -102,3 +76,40 @@ describe('UserModel', function () {
         );
     });
 });
+
+function assertUserData(savedData, callback) {
+    expect(savedData.email).to.equal(testData.email);
+    expect(savedData.hash).to.equal(testData.hash);
+    expect(savedData.salt).to.equal(testData.salt);
+    expect(savedData.firstName).to.equal(testData.firstName);
+    expect(savedData.lastName).to.equal(testData.lastName);
+    expect(savedData.honorific).to.equal(testData.honorific);
+    expect(savedData.sex).to.equal(testData.sex);
+    expect(savedData.address).to.equal(testData.address);
+    expect(savedData.city).to.equal(testData.city);
+    expect(savedData.zipCode).to.equal(testData.zipCode);
+    expect(savedData.role).to.equal(testData.role);
+    return callback();
+}
+
+function assertEmailDuplication(callback) {
+    var userA = new User(testData);
+    var userB = new User(testData);
+
+    userA.save(function (err, savedA) {
+        userB.save(function (err, savedB) {
+            expect(savedA.email).to.not.equal(savedB.email);
+
+            return callback();
+        });
+    });
+}
+
+function assertUserPassword(savedData, password, callback) {
+    expect(savedData.hash).to.not.equal(password);
+    expect(savedData.salt).to.not.equal(password);
+
+    expect(savedData.hash).to.not.equal(testData.hash);
+    expect(savedData.salt).to.not.equal(testData.salt);
+    return callback();
+}

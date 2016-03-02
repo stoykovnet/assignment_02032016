@@ -10,7 +10,7 @@ process.env.NODE_ENV = 'test';
  * with the test and thus altering the results.
  */
 beforeEach(function (done) {
-
+    // Open connection, if it is not open.
     if (mongoose.connection.readyState === 0) {
         mongoose.connect(databaseUrl(), function (err) {
             if (err) {
@@ -24,11 +24,19 @@ beforeEach(function (done) {
     }
 });
 
+/**
+ * Drop the database.
+ * @param done
+ * @returns {*}
+ */
 function clearDatabase(done) {
     mongoose.connection.db.dropDatabase();
     return done();
 }
 
+/**
+ * Close connection after each test.
+ */
 afterEach(function (done) {
     mongoose.disconnect();
     return done();
