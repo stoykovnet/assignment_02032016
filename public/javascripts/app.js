@@ -34,6 +34,12 @@ app.config([
                         $state.go('home');
                     }
                 }]
+            })
+
+            .state('users', {
+                url: '/users',
+                templateUrl: '/users.html',
+                controller: 'UsersCtrl'
             });
 
         $urlRouterProvider.otherwise('home');
@@ -41,9 +47,9 @@ app.config([
 ]);
 
 app.controller('MainCtrl', [
-    '$scope',
-    function ($scope) {
-
+    '$scope', 'userService',
+    function ($scope, userService) {
+        $scope.users = userService.users;
     }]);
 
 app.controller('AuthenticationCtrl', ['$scope', '$state', 'auth',
@@ -79,6 +85,14 @@ app.controller('NavigationCtrl', ['$scope', 'auth',
         $scope.isLoggedIn = auth.isLoggedIn;
         $scope.currentUser = auth.currentUser;
         $scope.logOut = auth.logOut;
+    }]);
+
+app.controller('UsersCtrl', ['$scope', '$stateParams', 'users',
+    function($scope, $stateParams, users){
+        $scope.users.push({
+            email: 'mymail',
+            name: 'name'
+        })
     }]);
 
 /**
@@ -154,3 +168,21 @@ app.factory('auth', ['$http', '$window',
 
         return auth;
     }]);
+
+app.factory('userService', ['$http', function () {
+    var userService = {};
+
+    userService.getAll = function () {
+        return $http.get('/users').success(function (data) {
+            angular.copy(data, userService.users)
+        });
+    };
+
+    userService.get = function(id) {
+        return $http.get('/users/' + id).then(function(res){
+            return res.data;
+        });
+    };
+
+    return userService;
+}]);

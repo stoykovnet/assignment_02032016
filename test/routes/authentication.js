@@ -13,9 +13,9 @@ var request = require('request');
 // Base URL, which is going to be used for the requests.
 var url = 'http://localhost:3000/authentication/';
 
-describe('Authentication', function () {
+describe("Authentication | Base URI: 'http://localhost:3000/authentication/'", function () {
 
-    describe("URI: '/authentication/register'", function () {
+    describe("URI: '/register'", function () {
         it('should make an account for user and generate token',
             function (done) {
                 sendPostRegister(dataToSend.registration.complete,
@@ -60,7 +60,7 @@ describe('Authentication', function () {
         );
     });
 
-    describe("URI: '/authentication/login' - log in to account", function () {
+    describe("URI: '/login' - log in to account", function () {
         it('should authenticate only users with valid credentials - should show errors',
             function (done) {
                 // A user must be inserted first, in order to test log in.

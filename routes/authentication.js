@@ -10,9 +10,6 @@ var mongoose = require('mongoose');
 var User = mongoose.model('User');
 var passport = require('passport');
 
-// Authentication imports.
-var Auth = require('../middleware/Auth');
-
 /* POST URI: /authentication/register - Make an account*/
 router.post('/register', function (req, res) {
     authCtrl.validateRegisterInput(req, function (errors) {

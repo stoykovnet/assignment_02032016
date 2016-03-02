@@ -21,6 +21,7 @@ require('./config/passport');
 // Routes imports.
 var routes = require('./routes/index');
 var authentication = require('./routes/authentication');
+var users = require('./routes/users');
 
 // Initialize application.
 var app = express();
@@ -54,6 +55,7 @@ app.use(passport.initialize()); // Authentication
  */
 app.use('/', routes);
 app.use('/authentication', authentication);
+app.use('/users', users);
 
 /**
  * 404 & 500 Error handlers.

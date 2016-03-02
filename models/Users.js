@@ -42,14 +42,14 @@ UserSchema.methods.generateToken = function () {
 
     var today = new Date();
     var expire = new Date();
-    expire.setDate(today.getDate() + 30);
+    expire.setDate(today.getDate() + 60);
 
     return jwt.sign({
             _id: this._id,
             email: this.email,
             expire: parseInt(expire.getTime() / 1000)
         },
-        'SOME_SECRET' // Secret key to sign tokens.
+        'SECRET' // Secret key to sign tokens.
     );
 };
 

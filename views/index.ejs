@@ -12,6 +12,17 @@
 </head>
 <body ng-app="ums" ng-controller="MainCtrl">
 
+<nav class="navbar navbar-default" ng-controller="NavigationCtrl">
+    <ul class="nav navbar-nav">
+        <li>
+            <a href="/#/">Home</a>
+        </li>
+        <li>
+            <a href="/#/users">Users</a>
+        </li>
+    </ul>
+</nav>
+
 <nav class="navbar navbar-default pull-right" ng-controller="NavigationCtrl">
     <ul class="nav navbar-nav">
         <li ng-show="isLoggedIn()">
@@ -113,6 +124,7 @@
         </form>
     </script>
 
+    <!-- login view -->
     <script type="text/ng-template" id="/login.html">
         <h3>Log in to your account</h3>
 
@@ -140,6 +152,13 @@
                 Log In
             </button>
         </form>
+    </script>
+
+    <!-- users view -->
+    <script type="text/ng-template" id="/users.html">
+        <h3>Users</h3>
+
+        {{ users.email; }}
     </script>
 </div>
 
