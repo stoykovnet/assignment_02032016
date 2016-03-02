@@ -1,6 +1,7 @@
 // Database imports.
 var mongoose = require('mongoose');
 var User = mongoose.model('User');
+var passport = require('passport');
 
 var AuthenticationCtrl = new function () {
 
@@ -25,6 +26,46 @@ var AuthenticationCtrl = new function () {
     };
 
     /**
+     * Store user data into the database. It callbacks error if saving fails.
+     * @param req
+     * @param callback
+     */
+    this.registerUser = function (req, callback) {
+        _populateUser(req, function (user) {
+
+            user.save(function (err) {
+                if (err) return callback(err);
+
+                return callback({token: user.generateToken()});
+            });
+        });
+    };
+
+    this.validateLoginInput = function (req, callback) {
+        var errors = [];
+
+        _validateEmail(req.body.email, function (email_err) {
+            if (email_err) errors.push(email_err);
+            if (!req.body.password) errors.push('Enter your password');
+
+            return callback(errors, req);
+        });
+    };
+
+    this.authenticate = function (req, res, callback) {
+        passport.authenticate('local', function (err, user, info) {
+            if (err) return callback(err);
+
+            if (user) {
+                return callback({token: user.generateToken()});
+            } else {
+                console.log(info);
+                return callback(info);
+            }
+        })(req, res);
+    };
+
+    /**
      * Check if the provided email is valid. If an email is invalid it callbacks error.
      * @param email
      * @param callback
@@ -39,22 +80,6 @@ var AuthenticationCtrl = new function () {
 
         return callback(); // Email is ok!
     }
-
-    /**
-     * Store user data into the database. It callbacks error if saving fails.
-     * @param req
-     * @param callback
-     */
-    this.registerUser = function (req, callback) {
-        _populateUser(req, function (user) {
-
-            user.save(function (err, saved) {
-                if (err) return callback(err);
-
-                return callback(saved);
-            });
-        });
-    };
 
     /**
      * Create a User model object and populate it with the provided data.
