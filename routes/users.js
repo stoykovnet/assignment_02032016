@@ -11,7 +11,6 @@ var passport = require('passport');
 var Auth = require('../middleware/Auth');
 
 router.get('/', Auth, function (req, res, next) {
-
     User.find(function (err, users) {
         if (err)return next(err);
 
@@ -19,11 +18,11 @@ router.get('/', Auth, function (req, res, next) {
     });
 });
 
-router.get('/:user', function (req, res, next) {
+router.get('/:user', Auth, function (req, res, next) {
     res.json(req.user);
 });
 
-router.put('/:user', function (req, res, next) {
+router.put('/:user', Auth, function (req, res, next) {
     var user = req.user;
 
     user.firstName = req.body.firstName;

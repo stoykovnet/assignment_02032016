@@ -65,17 +65,17 @@ app.factory('users', ['$http', 'auth',
 
         u.getAll = function () {
             return $http.get('/users', {
-                headers: {Authorization: 'Bearer '+auth.getToken()}
+                headers: {Authorization: 'Bearer ' + auth.getToken()}
             }).error(function (error) {
-                alert(error);
-                alert(auth.getToken);
             }).success(function (data) {
                 angular.copy(data, u.users);
             });
         };
 
         u.get = function (id) {
-            return $http.get('/users/' + id).then(function (res) {
+            return $http.get('/users/' + id, {
+                headers: {Authorization: 'Bearer ' + auth.getToken()}
+            }).then(function (res) {
                 res.data;
                 return res.data;
             });
@@ -99,7 +99,7 @@ app.factory('auth', ['$http', '$window',
             $window.localStorage['ums-token'] = token;
         };
 
-        auth.getToken = function (){
+        auth.getToken = function () {
             return $window.localStorage['ums-token'];
         };
 
@@ -132,7 +132,7 @@ app.factory('auth', ['$http', '$window',
         };
 
         auth.logIn = function (user) {
-            return $http.post('authenticate/login', user)
+            return $http.post('authentication/login', user)
                 .success(function (data) {
                     auth.saveToken(data.token);
                 });
@@ -145,8 +145,9 @@ app.factory('auth', ['$http', '$window',
         return auth;
     }]);
 
-app.controller('HomeCtrl', [
-    function () {
+app.controller('HomeCtrl', ['$scope', 'users',
+    function ($scope, users) {
+        $scope.users = users;
     }]);
 
 app.controller('AdminCtrl', ['$scope', 'users',
@@ -180,8 +181,8 @@ app.controller('AuthCtrl', ['$scope', '$state', 'auth',
         };
     }]);
 
-app.controller('NavCtrl', ['$scope','auth',
-    function($scope, auth){
+app.controller('NavCtrl', ['$scope', 'auth',
+    function ($scope, auth) {
         $scope.isLoggedIn = auth.isLoggedIn;
         $scope.currentUser = auth.currentUser;
         $scope.logOut = auth.logOut;
