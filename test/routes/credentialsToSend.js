@@ -18,7 +18,11 @@ var dataToSend = {
     },
     login: {
         complete: {
-            email: userTestData.email,
+            email: 'test@testen.com',
+            password: 'password'
+        },
+        invalid: {
+            email: 'dont@exist.com',
             password: 'password'
         }
     },

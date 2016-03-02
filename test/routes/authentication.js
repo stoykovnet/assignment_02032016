@@ -7,7 +7,7 @@ var dataToSend = require('./credentialsToSend');
 var userTestData = require('../userTestData');
 userTestData['password'] = 'password';
 
-// http
+// http imports.
 var request = require('request');
 
 // Base URL, which is going to be used for the requests.
@@ -16,13 +16,11 @@ var url = 'http://localhost:3000/authentication/';
 describe('Authentication', function () {
 
     describe("URI: '/authentication/register'", function () {
-        it('should make an account for user',
+        it('should make an account for user and generate token',
             function (done) {
                 sendPostRegister(dataToSend.registration.complete,
                     function (err, res, body) {
-                        expect(res.statusCode).to.equal(200);
-
-                        assertUserData(JSON.parse(body), done);
+                        assertTokenGenerated(res, body, done);
                     });
             }
         );
@@ -67,10 +65,9 @@ describe('Authentication', function () {
             function (done) {
                 // A user must be inserted first, in order to test log in.
                 sendPostRegister(dataToSend.registration.required, function () {
-
                     sendPostLogin(dataToSend.login.complete, function (err, res, body) {
 
-                        assertPostResponse(res, body, 200, userTestData, done);
+                        assertTokenGenerated(res, body, done);
                     });
                 });
             }
@@ -78,14 +75,12 @@ describe('Authentication', function () {
 
         it('should not authenticate users with invalid credentials - should show errors',
             function (done) {
-                sendPostLogin(dataToSend.login.complete, function (err, res, body) {
+                sendPostLogin(dataToSend.login.invalid, function (err, res, body) {
                     var expectedErrors = {
-                        errors: [
-                            'Cannot log in. Please check your credentials.'
-                        ]
+                        errors: ['Cannot log in. Please check your credentials.']
                     };
 
-                    assertPostResponse(res, body, 403, expectedErrors, done);
+                    assertPostResponse(res, body, 400, expectedErrors, done);
                 });
             }
         );
@@ -108,19 +103,6 @@ describe('Authentication', function () {
     });
 });
 
-function assertUserData(httpUser, callback) {
-    expect(httpUser.email).to.equal(userTestData.email);
-    expect(httpUser.firstName).to.equal(userTestData.firstName);
-    expect(httpUser.lastName).to.equal(userTestData.lastName);
-    expect(httpUser.honorific).to.equal(userTestData.honorific);
-    expect(httpUser.sex).to.equal(userTestData.sex);
-    expect(httpUser.city).to.equal(userTestData.city);
-    expect(httpUser.zipCode).to.equal(userTestData.zipCode);
-    expect(httpUser.role).to.equal(userTestData.role);
-
-    return callback();
-}
-
 function assertPostResponse(res, body, expectedCode, expectedResponse, callback) {
     expect(res.statusCode).to.equal(expectedCode);
 
@@ -134,6 +116,7 @@ function sendPostRegister(formData, callback) {
         url: url + 'register',
         form: formData
     }, function (err, res, body) {
+        //console.log('RESPONSE: ' + body);
         return callback(err, res, body);
     });
 }
@@ -146,4 +129,12 @@ function sendPostLogin(formData, callback) {
     }, function (err, res, body) {
         return callback(err, res, body);
     });
+}
+
+function assertTokenGenerated(res, body, callback) {
+    expect(res.statusCode).to.equal(200);
+    // The exact value cannot be asserted. Check only if a token is present.
+    expect(body.substr(2, 5)).to.equal('token');
+
+    return callback();
 }
