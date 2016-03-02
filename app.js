@@ -9,7 +9,7 @@ var bodyParser = require('body-parser');
 // Database connection and models imports.
 var mongoose = require('mongoose');
 require('./models/Users');
-var databaseUrl = require('./config/databaseUrl');
+var databaseUrl = require('./config/getDatabaseUrl');
 
 // Authentication imports.
 var passport = require('passport');
@@ -25,18 +25,7 @@ var app = express();
 /**
  * Database connection configuration.
  */
-switch (app.get('env')) {
-    case 'production':
-        mongoose.connect(databaseUrl.production);
-        break;
-    case 'test':
-        mongoose.connect(databaseUrl.test);
-        break;
-    case 'development':
-    default:
-        mongoose.connect(databaseUrl.development);
-        break;
-}
+mongoose.connect(databaseUrl());
 
 /**
  * View engine setup

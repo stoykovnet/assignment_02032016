@@ -1,12 +1,14 @@
 // Test imports.
+require('../utils');
 var expect = require('chai').expect;
 var request = require('request');
 var userTestData = require('../userTestData');
+userTestData['password'] = 'password';
 
 describe('Authentication', function () {
     var url = 'http://localhost:3000/authentication/';
 
-    describe("URI: '/authentication/register - make an account", function () {
+    describe("URI: '/authentication/register'", function () {
         it('should make an account for user',
             function (done) {
                 request.post({
@@ -14,9 +16,18 @@ describe('Authentication', function () {
                     form: userTestData
                 }, function (err, res, body) {
 
+                    var httpUser = JSON.parse(body);
+
                     expect(res.statusCode).to.equal(200);
 
-                    expect(body).to.equal(JSON.stringify(userTestData));
+                    expect(httpUser.email).to.equal(userTestData.email);
+                    expect(httpUser.firstName).to.equal(userTestData.firstName);
+                    expect(httpUser.lastName).to.equal(userTestData.lastName);
+                    expect(httpUser.honorific).to.equal(userTestData.honorific);
+                    expect(httpUser.sex).to.equal(userTestData.sex);
+                    expect(httpUser.city).to.equal(userTestData.city);
+                    expect(httpUser.zipCode).to.equal(userTestData.zipCode);
+                    expect(httpUser.role).to.equal(userTestData.role);
                     done();
                 });
             }

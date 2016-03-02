@@ -1,6 +1,6 @@
 // Database connection imports.
 var mongoose = require('mongoose');
-var databaseUrl = require('../config/databaseUrl');
+var databaseUrl = require('../config/getDatabaseUrl');
 
 // Change mode.
 process.env.NODE_ENV = 'test';
@@ -12,7 +12,7 @@ process.env.NODE_ENV = 'test';
 beforeEach(function (done) {
 
     if (mongoose.connection.readyState === 0) {
-        mongoose.connect(databaseUrl.test, function (err) {
+        mongoose.connect(databaseUrl(), function (err) {
             if (err) {
                 return console.error(err);
             }
@@ -25,12 +25,8 @@ beforeEach(function (done) {
 });
 
 function clearDatabase(done) {
-
-    for (var i in mongoose.connection.collections) {
-        mongoose.connection.collections[i].remove(function () {
-        });
-    }
-    return done(); // We're done - the database is in a clean state.
+    mongoose.connection.db.dropDatabase();
+    return done();
 }
 
 afterEach(function (done) {

@@ -33,15 +33,14 @@ describe('UserModel', function () {
             }
         );
 
-        it('should not allow two authentication to have the same email address',
+        it('should not allow two users to have the same email address',
             function (done) {
                 var userA = new User(testData);
                 var userB = new User(testData);
 
-                userA.save(function (err) {
-                    userB.save(function (err) {
-                        //There should be an error!
-                        expect(err).to.not.equal(null);
+                userA.save(function (err, savedA) {
+                    userB.save(function (err, savedB) {
+                        expect(savedA).to.not.equal(savedB);
 
                         done();
                     });
