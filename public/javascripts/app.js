@@ -10,6 +10,30 @@ app.config([
                 url: '/home',
                 templateUrl: '/home.html',
                 controller: 'MainCtrl'
+            })
+
+            // if user is already logged in he or she will be redirected to home.
+            .state('login', {
+                url: '/login',
+                templateUrl: '/login.html',
+                controller: 'AuthenticationCtrl',
+                onEnter: ['$state', 'auth', function ($state, auth) {
+                    if (auth.isLoggedIn()) {
+                        $state.go('home');
+                    }
+                }]
+            })
+
+            // if user is already logged in he or she will be redirected to home.
+            .state('register', {
+                url: '/register',
+                templateUrl: '/register.html',
+                controller: 'AuthenticationCtrl',
+                onEnter: ['$state', 'auth', function ($state, auth) {
+                    if (auth.isLoggedIn()) {
+                        $state.go('home');
+                    }
+                }]
             });
 
         $urlRouterProvider.otherwise('home');
@@ -19,52 +43,42 @@ app.config([
 app.controller('MainCtrl', [
     '$scope',
     function ($scope) {
-        $scope.users = [
-            {
-                _id: 'testtesten',
-                email: 'test@testen.com',
-                firstName: 'test',
-                lastName: 'testen',
-                role: 'user'
-            },
-            {
-                _id: 'testentest',
-                email: 'test@testen.com',
-                firstName: 'test',
-                lastName: 'testen',
-                role: 'user'
-            }
-        ];
 
-        $scope.registerUser = function () {
-            if (!$scope.email
-                || !$scope.password
-                || !$scope.firstName
-                || !$scope.lastName
-            )
-                return;
+    }]);
 
-            _saveRegistration();
+app.controller('AuthenticationCtrl', ['$scope', '$state', 'auth',
+    function ($scope, $state, auth) {
+        $scope.user = {};
 
-            _clearRegistrationScope();
+        /*
+         *  Register user, on fail changes state to home.
+         */
+        $scope.register = function () {
+            auth.register($scope.user)
+                .error(function (error) {
+                    $scope.error = error;
+                })
+                .then(function () {
+                    $state.go('home');
+                });
         };
 
-        function _saveRegistration() {
-            $scope.users.push({
-                email: $scope.email,
-                password: $scope.password,
-                firstName: $scope.firstName,
-                lastName: $scope.lastName
-            });
-        }
+        $scope.login = function () {
+            auth.login($scope.user)
+                .error(function (error) {
+                    $scope.error = error;
+                })
+                .then(function () {
+                    $state.go('home')
+                });
+        };
+    }]);
 
-        function _clearRegistrationScope() {
-            $scope.email = '';
-            $scope.password = '';
-            $scope.firstName = '';
-            $scope.lastName = '';
-        }
-
+app.controller('NavigationCtrl', ['$scope', 'auth',
+    function ($scope, auth) {
+        $scope.isLoggedIn = auth.isLoggedIn;
+        $scope.currentUser = auth.currentUser;
+        $scope.logOut = auth.logOut;
     }]);
 
 /**
@@ -80,7 +94,7 @@ app.factory('auth', ['$http', '$window',
 
         auth.getToken = function () {
             return $window.localStorage['ums-user-token'];
-        }
+        };
 
         /*
          * Check if current user has a valid token.
@@ -114,7 +128,7 @@ app.factory('auth', ['$http', '$window',
          * On success a token will be saved, otherwise user should retry registration.
          */
         auth.register = function (user) {
-            return $http.post('/authentication/post', user)
+            return $http.post('/authentication/register', user)
                 .success(function (data) {
                     auth.saveToken(data.token);
                 });
@@ -124,8 +138,8 @@ app.factory('auth', ['$http', '$window',
          * Send user credentials to server to log him or her in.
          * On success a token will be saved, otherwise user should retry logging in.
          */
-        auth.logIn = function (user) {
-            return $http.post('/login', user)
+        auth.login = function (user) {
+            return $http.post('/authentication/login', user)
                 .success(function (data) {
                     auth.saveToken(data.token);
                 });

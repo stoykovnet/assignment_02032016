@@ -13,7 +13,7 @@ var passport = require('passport');
 // Authentication imports.
 var Auth = require('../middleware/Auth');
 
-/* POST register - Make an account*/
+/* POST URI: /authentication/register - Make an account*/
 router.post('/register', function (req, res) {
     authCtrl.validateRegisterInput(req, function (errors) {
         // If something is wrong with input there'll be errors.
@@ -25,7 +25,7 @@ router.post('/register', function (req, res) {
     });
 });
 
-/* POST login - Log in to account */
+/* POST URI /authentication/login - Log in to account */
 router.post('/login', function (req, res, next) {
     authCtrl.validateLoginInput(req, function (errors, req) {
         // If something is wrong with input there'll be errors.
