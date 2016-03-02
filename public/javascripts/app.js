@@ -65,7 +65,10 @@ app.factory('users', ['$http', 'auth',
 
         u.getAll = function () {
             return $http.get('/users', {
-                headers: {Authorization: 'Bearer' + auth.getToken()}
+                headers: {Authorization: 'Bearer '+auth.getToken()}
+            }).error(function (error) {
+                alert(error);
+                alert(auth.getToken);
             }).success(function (data) {
                 angular.copy(data, u.users);
             });
@@ -96,7 +99,7 @@ app.factory('auth', ['$http', '$window',
             $window.localStorage['ums-token'] = token;
         };
 
-        auth.getToken = function () {
+        auth.getToken = function (){
             return $window.localStorage['ums-token'];
         };
 
@@ -129,7 +132,7 @@ app.factory('auth', ['$http', '$window',
         };
 
         auth.logIn = function (user) {
-            return $http.post('authentication/login', user)
+            return $http.post('authenticate/login', user)
                 .success(function (data) {
                     auth.saveToken(data.token);
                 });

@@ -33,6 +33,7 @@ router.post('/login', function (req, res, next) {
                 res.status(401).json(error);
             },
             function (token) { // Login accepted.
+                console.log(token);
                 return res.json(token);
             });
     });

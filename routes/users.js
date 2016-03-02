@@ -11,6 +11,7 @@ var passport = require('passport');
 var Auth = require('../middleware/Auth');
 
 router.get('/', Auth, function (req, res, next) {
+
     User.find(function (err, users) {
         if (err)return next(err);
 
