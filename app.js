@@ -8,12 +8,10 @@ var bodyParser = require('body-parser');
 
 // Database connection and models imports.
 var mongoose = require('mongoose');
+var passport = require('passport'); //Auth.
 require('./models/Users');
+require('./config/passport'); //Auth.
 var databaseUrl = require('./config/getDatabaseUrl');
-
-// Authentication imports.
-var passport = require('passport');
-require('./config/passport');
 
 // Routes imports.
 var routes = require('./routes/index');
