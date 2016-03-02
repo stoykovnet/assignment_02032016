@@ -1,118 +1,105 @@
 var app = angular.module('ums', ['ui.router']);
 
-app.config([
-    '$stateProvider',
-    '$urlRouterProvider',
+app.config(['$stateProvider', '$urlRouterProvider',
     function ($stateProvider, $urlRouterProvider) {
 
         $stateProvider
             .state('home', {
                 url: '/home',
                 templateUrl: '/home.html',
-                controller: 'MainCtrl'
+                controller: 'HomeCtrl'
             })
 
-            // if user is already logged in he or she will be redirected to home.
-            .state('login', {
-                url: '/login',
-                templateUrl: '/login.html',
-                controller: 'AuthenticationCtrl',
-                onEnter: ['$state', 'auth', function ($state, auth) {
-                    if (auth.isLoggedIn()) {
-                        $state.go('home');
-                    }
-                }]
-            })
-
-            // if user is already logged in he or she will be redirected to home.
-            .state('register', {
-                url: '/register',
-                templateUrl: '/register.html',
-                controller: 'AuthenticationCtrl',
-                onEnter: ['$state', 'auth', function ($state, auth) {
-                    if (auth.isLoggedIn()) {
-                        $state.go('home');
-                    }
-                }]
+            .state('admin', {
+                url: '/users',
+                templateUrl: '/users.html',
+                controller: 'AdminCtrl',
+                resolve: {
+                    userPromise: ['users', function (users) {
+                        return users.getAll();
+                    }]
+                }
             })
 
             .state('users', {
-                url: '/users',
-                templateUrl: '/users.html',
-                controller: 'UsersCtrl'
+                url: '/users/{id}',
+                templateUrl: '/user-details.html',
+                controller: 'UsersCtrl',
+                resolve: {
+                    user: ['$stateParams', 'users', function ($stateParams, users) {
+                        return users.get($stateParams.id);
+                    }]
+                }
+            })
+
+            .state('login', {
+                url: '/login',
+                templateUrl: '/login.html',
+                controller: 'AuthCtrl',
+                onEnter: ['$state', 'auth', function ($state, auth) {
+                    if (auth.isLoggedIn()) {
+                        $state.go('home');
+                    }
+                }]
+            })
+
+            .state('register', {
+                url: '/register',
+                templateUrl: '/register.html',
+                controller: 'AuthCtrl',
+                onEnter: ['$state', 'auth', function ($state, auth) {
+                    if (auth.isLoggedIn()) {
+                        $state.go('home');
+                    }
+                }]
             });
 
         $urlRouterProvider.otherwise('home');
-    }
-]);
-
-app.controller('MainCtrl', [
-    '$scope', 'userService',
-    function ($scope, userService) {
-        $scope.users = userService.users;
     }]);
 
-app.controller('AuthenticationCtrl', ['$scope', '$state', 'auth',
-    function ($scope, $state, auth) {
-        $scope.user = {};
+app.factory('users', ['$http', 'auth',
+    function ($http, auth) {
+        var u = {
+            users: []
+        };
 
-        /*
-         *  Register user, on fail changes state to home.
-         */
-        $scope.register = function () {
-            auth.register($scope.user)
-                .error(function (error) {
-                    $scope.error = error;
-                })
-                .then(function () {
-                    $state.go('home');
+        u.getAll = function () {
+            return $http.get('/users', {
+                headers: {Authorization: 'Bearer' + auth.getToken()}
+            }).success(function (data) {
+                angular.copy(data, u.users);
+            });
+        };
+
+        u.get = function (id) {
+            return $http.get('/users/' + id).then(function (res) {
+                res.data;
+                return res.data;
+            });
+        };
+
+        u.update = function (user) {
+            return $http.put('/users/' + user._id)
+                .success(function (data) {
+                    user = data;
                 });
         };
 
-        $scope.login = function () {
-            auth.login($scope.user)
-                .error(function (error) {
-                    $scope.error = error;
-                })
-                .then(function () {
-                    $state.go('home')
-                });
-        };
+        return u;
     }]);
 
-app.controller('NavigationCtrl', ['$scope', 'auth',
-    function ($scope, auth) {
-        $scope.isLoggedIn = auth.isLoggedIn;
-        $scope.currentUser = auth.currentUser;
-        $scope.logOut = auth.logOut;
-    }]);
-
-app.controller('UsersCtrl', ['$scope', '$stateParams', 'users',
-    function($scope, $stateParams, users){
-        $scope.users.push({
-            email: 'mymail',
-            name: 'name'
-        })
-    }]);
-
-/**
- * Use auth to maintain a session for user.
- */
 app.factory('auth', ['$http', '$window',
     function ($http, $window) {
         var auth = {};
 
         auth.saveToken = function (token) {
-            $window.localStorage['ums-user-token'] = token;
+            $window.localStorage['ums-token'] = token;
         };
 
         auth.getToken = function () {
-            return $window.localStorage['ums-user-token'];
+            return $window.localStorage['ums-token'];
         };
 
-        /*
-         * Check if current user has a valid token.
-         */
         auth.isLoggedIn = function () {
             var token = auth.getToken();
 
@@ -125,9 +112,6 @@ app.factory('auth', ['$http', '$window',
             }
         };
 
-        /*
-         * Get user's email if he or she is logged in.
-         */
         auth.currentUser = function () {
             if (auth.isLoggedIn()) {
                 var token = auth.getToken();
@@ -137,52 +121,65 @@ app.factory('auth', ['$http', '$window',
             }
         };
 
-        /*
-         * Send user data to server to register him or her.
-         * On success a token will be saved, otherwise user should retry registration.
-         */
         auth.register = function (user) {
-            return $http.post('/authentication/register', user)
+            return $http.post('authentication/register', user)
                 .success(function (data) {
                     auth.saveToken(data.token);
                 });
         };
 
-        /*
-         * Send user credentials to server to log him or her in.
-         * On success a token will be saved, otherwise user should retry logging in.
-         */
-        auth.login = function (user) {
-            return $http.post('/authentication/login', user)
+        auth.logIn = function (user) {
+            return $http.post('authentication/login', user)
                 .success(function (data) {
                     auth.saveToken(data.token);
                 });
         };
 
-        /*
-         * Remove user token to log him or her out.
-         */
         auth.logOut = function () {
-            $window.localStorage.removeItem('ums-user-token');
+            $window.localStorage.removeItem('ums-token');
         };
 
         return auth;
     }]);
 
-app.factory('userService', ['$http', function () {
-    var userService = {};
+app.controller('HomeCtrl', [
+    function () {
+    }]);
 
-    userService.getAll = function () {
-        return $http.get('/users').success(function (data) {
-            angular.copy(data, userService.users)
-        });
-    };
+app.controller('AdminCtrl', ['$scope', 'users',
+    function ($scope, users) {
+        $scope.users = users.users;
+    }]);
 
-    userService.get = function(id) {
-        return $http.get('/users/' + id).then(function(res){
-            return res.data;
-        });
-    };
+app.controller('UsersCtrl', ['$scope', 'user',
+    function ($scope, user) {
+        $scope.user = user;
+    }]);
 
-    return userService;
-}]);
+app.controller('AuthCtrl', ['$scope', '$state', 'auth',
+    function ($scope, $state, auth) {
+        $scope.user = {};
+
+        $scope.register = function () {
+            auth.register($scope.user).error(function (error) {
+                $scope.error = error;
+            }).then(function () {
+                $state.go('home');
+            });
+        };
+
+        $scope.logIn = function () {
+            auth.logIn($scope.user).error(function (error) {
+                $scope.error = error;
+            }).then(function () {
+                $state.go('home');
+            });
+        };
+    }]);
+
+app.controller('NavCtrl', ['$scope','auth',
+    function($scope, auth){
+        $scope.isLoggedIn = auth.isLoggedIn;
+        $scope.currentUser = auth.currentUser;
+        $scope.logOut = auth.logOut;
+    }]);

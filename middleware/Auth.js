@@ -1,6 +1,6 @@
 var jwt = require('express-jwt');
 
-var Auth = new jwt({
+var Auth = jwt({
     secret: 'SECRET', userProperty: 'payload'
 });
 

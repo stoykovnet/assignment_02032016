@@ -1,9 +1,9 @@
+// Authentication imports.
+var passport = require('passport');
+
 // Database imports.
 var mongoose = require('mongoose');
 var User = mongoose.model('User');
-
-// Authentication imports.
-var passport = require('passport');
 
 var AuthenticationCtrl = new function () {
 
@@ -55,6 +55,7 @@ var AuthenticationCtrl = new function () {
     };
 
     this.authenticate = function (req, res, error, callback) {
+
         passport.authenticate('local', function (err, user, info) {
             if (err) return error(err);
 
