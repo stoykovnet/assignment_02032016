@@ -31,9 +31,13 @@ router.post('/login', function (req, res, next) {
         // If something is wrong with input there'll be errors.
         if (errors.length > 0) return res.status(400).json({errors: errors});
 
-        authCtrl.authenticate(req, res, function (token) {
-            return res.json(token);
-        });
+        authCtrl.authenticate(req, res,
+            function (error) { // Login not accepted.
+                res.status(401).json(error);
+            },
+            function (token) { // Login accepted.
+                return res.json(token);
+            });
     });
 });
 

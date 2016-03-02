@@ -54,15 +54,14 @@ var AuthenticationCtrl = new function () {
         });
     };
 
-    this.authenticate = function (req, res, callback) {
+    this.authenticate = function (req, res, error, callback) {
         passport.authenticate('local', function (err, user, info) {
-            if (err) return callback(err);
+            if (err) return error(err);
 
             if (user) {
                 return callback({token: user.generateToken()});
             } else {
-                console.log(info);
-                return callback(info);
+                return error(info);
             }
         })(req, res);
     };

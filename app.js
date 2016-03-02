@@ -1,3 +1,5 @@
+process.env.NODE_ENV = 'development';
+
 // Express imports.
 var express = require('express');
 var path = require('path');

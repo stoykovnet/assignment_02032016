@@ -64,7 +64,7 @@
         <h3>Make an account</h3>
 
         <div ng-show="error" class="alert alert-danger-row">
-            <span>{{ error.toString(); }}</span>
+            <span>{{ error.errors.toString(); }}</span>
         </div>
 
         <form ng-submit="register()"
@@ -99,7 +99,10 @@
                 <label for="role">
                     Role:
                 </label>
-                <select class="form-control" id="role" name="role">
+                <select class="form-control"
+                        id="role"
+                        name="role"
+                        ng-model="user.role">
                     <option value="user">User</option>
                     <option value="admin">Admin</option>
                 </select>

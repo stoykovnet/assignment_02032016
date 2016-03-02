@@ -23,7 +23,7 @@ var dataToSend = {
         },
         invalid: {
             email: 'dont@exist.com',
-            password: 'password'
+            password: 'xxx'
         }
     },
     empty: {}

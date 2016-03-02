@@ -80,7 +80,7 @@ describe('Authentication', function () {
                         errors: ['Cannot log in. Please check your credentials.']
                     };
 
-                    assertPostResponse(res, body, 400, expectedErrors, done);
+                    assertPostResponse(res, body, 401, expectedErrors, done);
                 });
             }
         );
@@ -105,7 +105,7 @@ describe('Authentication', function () {
 
 function assertPostResponse(res, body, expectedCode, expectedResponse, callback) {
     expect(res.statusCode).to.equal(expectedCode);
-
+    console.log(body);
     expect(body).to.equal(JSON.stringify(expectedResponse));
 
     return callback();
