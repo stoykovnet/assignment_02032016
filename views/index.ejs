@@ -13,30 +13,33 @@
 <body ng-app="ums" ng-controller="MainCtrl">
 
 <div class="col-md-6 col-md-offset-3">
+    <ui-view></ui-view>
 
-    <div class="page-header">
-        <h1>UMS</h1>
-    </div>
+    <script type="text/ng-template" id="/home.html">
+        <div class="page-header">
+            <h1>UMS</h1>
+        </div>
 
-    <h2>Welcome to UMS - a small assignment</h2>
+        <h2>Welcome to UMS - a small assignment</h2>
 
-    <hr>
+        <hr>
 
-    <h3>Registered users</h3>
+        <h3>Registered users</h3>
 
-    <ul ng-repeat="user in users">
-        <li>
-            <!-- email is a link to profile -->
-            <h4>
-                <a href="/users/{{ user._id; }}">
-                    {{ user.email; }}
-                </a>
-            </h4>
-            <!-- user overview -->
-            {{ user.firstName; }} {{ user.lastName; }}
-            Role: {{ user.role; }}
-        </li>
-    </ul>
+        <ul ng-repeat="user in users">
+            <li>
+                <!-- email is a link to profile -->
+                <h4>
+                    <a href="/users/{{ user._id; }}">
+                        {{ user.email; }}
+                    </a>
+                </h4>
+                <!-- user overview -->
+                {{ user.firstName; }} {{ user.lastName; }}
+                Role: {{ user.role; }}
+            </li>
+        </ul>
+    </script>
 
     <form style="matgin-top: 30px;"
           ng-submit="registerUser()">

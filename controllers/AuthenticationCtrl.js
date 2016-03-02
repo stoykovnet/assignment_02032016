@@ -1,6 +1,8 @@
 // Database imports.
 var mongoose = require('mongoose');
 var User = mongoose.model('User');
+
+// Authentication imports.
 var passport = require('passport');
 
 var AuthenticationCtrl = new function () {

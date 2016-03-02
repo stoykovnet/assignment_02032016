@@ -8,10 +8,13 @@ var bodyParser = require('body-parser');
 
 // Database connection and models imports.
 var mongoose = require('mongoose');
-var passport = require('passport'); //Auth.
 require('./models/Users');
-require('./config/passport'); //Auth.
 var databaseUrl = require('./config/getDatabaseUrl');
+
+// Authentication imports
+var Auth = require('./middleware/Auth');
+var passport = require('passport');
+require('./config/passport');
 
 // Routes imports.
 var routes = require('./routes/index');
@@ -41,7 +44,8 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(passport.initialize());
+
+app.use(passport.initialize()); // Authentication
 
 /**
  * Routes
